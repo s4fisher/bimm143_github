@@ -124,16 +124,16 @@ adk
 
 
 ```{r}
-library(bio3d)
-adk <- read.pdb("6s36")
-m <- nma(adk)
-plot(m)
+#library(bio3d)
+#adk <- read.pdb("6s36")
+#m <- nma(adk)
+#plot(m)
 ```
 
 
 ```{r}
-m <- nma(adk)
-mktrj(m, file="adk_m7.pdb")
+#m <- nma(adk)
+#mktrj(m, file="adk_m7.pdb")
 ```
 
 
@@ -158,9 +158,9 @@ Bio3dview
 TRUE
 
 ```{r}
-library(bio3d)
-aa <- get.seq("1ake_A")
-aa
+#library(bio3d)
+#aa <- get.seq("1ake_A")
+#aa
 ```
 
 > Q13. How many amino acids are in this sequence, i.e. how long is this sequence? 
@@ -168,18 +168,18 @@ aa
 214
 
 ```{r}
-hits <- NULL
-hits$pdb.id <- c('1AKE_A','6S36_A','6RZE_A','3HPR_A','1E4V_A','5EJE_A','1E4Y_A','3X2S_A','6HAP_A','6HAM_A','4K46_A','3GMT_A','4PZL_A')
+#hits <- NULL
+#hits$pdb.id <- c('1AKE_A','6S36_A','6RZE_A','3HPR_A','1E4V_A','5EJE_A','1E4Y_A','3X2S_A','6HAP_A','6HAM_A','4K46_A','3GMT_A','4PZL_A')
 ```
 
 Download releated PDB files
 ```{r}
-files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+#files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
 ```
 
 Align releated PDBs
 ```{r}
-pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
+#pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
 ```
 
 
@@ -193,51 +193,51 @@ pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
 # Annotate
 Vector containing PDB database codes
 ```{r}
-ids <- basename.pdb(pdbs$id)
+#ids <- basename.pdb(pdbs$id)
 
-anno <- pdb.annotate(ids)
-unique(anno$source)
+#anno <- pdb.annotate(ids)
+#unique(anno$source)
 ```
 
 Perform PCA
 ```{r}
-pc.xray <- pca(pdbs)
-plot(pc.xray)
+#pc.xray <- pca(pdbs)
+#plot(pc.xray)
 ```
 
 
 Calculate RMSD
 ```{r}
-rd <- rmsd(pdbs)
+#rd <- rmsd(pdbs)
 
 # Structure-based clustering
-hc.rd <- hclust(dist(rd))
-grps.rd <- cutree(hc.rd, k=3)
+#hc.rd <- hclust(dist(rd))
+#grps.rd <- cutree(hc.rd, k=3)
 
-plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
+#plot(pc.xray, 1:2, col="grey50", bg=grps.rd, pch=21, cex=1)
 ```
 
 Visualize first principal component
 ```{r}
-pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
+#pc1 <- mktrj(pc.xray, pc=1, file="pc_1.pdb")
 ```
 
 lotting results with ggplot2
 ```{r}
-library(ggplot2)
-library(ggrepel)
+#library(ggplot2)
+#library(ggrepel)
 
-df <- data.frame(PC1=pc.xray$z[,1], 
-                 PC2=pc.xray$z[,2], 
-                 col=as.factor(grps.rd),
-                 ids=ids)
+#df <- data.frame(PC1=pc.xray$z[,1], 
+               #  PC2=pc.xray$z[,2], 
+                # col=as.factor(grps.rd),
+                # ids=ids)
 
-p <- ggplot(df) + 
-  aes(PC1, PC2, col=col, label=ids) +
-  geom_point(size=2) +
-  geom_text_repel(max.overlaps = 20) +
-  theme(legend.position = "none")
-p
+#p <- ggplot(df) + 
+# aes(PC1, PC2, col=col, label=ids) +
+ # geom_point(size=2) +
+ # geom_text_repel(max.overlaps = 20) +
+  #theme(legend.position = "none")
+#p
 ```
 
 
@@ -249,10 +249,10 @@ p
 We start with a database id "1ake_A"
 
 ```{r}
-library(bio3d)
+#library(bio3d)
 
-id <- "1ake_A"
-aa <- get.seq(id)
+#id <- "1ake_A"
+#aa <- get.seq(id)
 ```
 ```{r}
 #blast <- blast.pdb(aa)
@@ -265,20 +265,20 @@ Have a peak:
 
 ```{r}
 #hits <- plot(blast)
-hits <- NULL
-hits$pdb.id <- c('1AKE_A','6S36_A','6RZE_A','3HPR_A','1E4V_A','5EJE_A','1E4Y_A','3X2S_A','6HAP_A','6HAM_A','4K46_A','3GMT_A','4PZL_A')
+#hits <- NULL
+#hits$pdb.id <- c('1AKE_A','6S36_A','6RZE_A','3HPR_A','1E4V_A','5EJE_A','1E4Y_A','3X2S_A','6HAP_A','6HAM_A','4K46_A','3GMT_A','4PZL_A')
 ```
 
 Peak at our "top hits"
 
 ```{r}
-head(hits$pdb.id)
+#head(hits$pdb.id)
 ```
 
 Now we can download these "top hits" these will all be ADK structures in the PDB database. 
 
 ```{r}
-files <- get.pdb(hits$pdb.id, path="pdbs", split = TRUE, gzip=TRUE)
+#files <- get.pdb(hits$pdb.id, path="pdbs", split = TRUE, gzip=TRUE)
 ```
 
 
@@ -287,7 +287,7 @@ Now we can use the `install()` function from this package like this:
 `BiocManager::install("msa")`
 
 ```{r}
-pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
+#pdbs <- pdbaln(files, fit = TRUE, exefile="msa")
 ```
 
 Let's have a little peak at our structures after "fitting" or superposing:
@@ -298,20 +298,20 @@ Let's have a little peak at our structures after "fitting" or superposing:
 
 We can run functions like `rmsd()`, `rmsd()` and the best `pca()`
 ```{r}
-pc.xray <- pca(pdbs)
-plot(pc.xray)
+#pc.xray <- pca(pdbs)
+#plot(pc.xray)
 ```
 
 
 ```{r}
-plot(pc.xray, 1:2)
+#plot(pc.xray, 1:2)
 ```
 
 
 Finally, let's make a movie of the major "motion" or structural difference in the dataset - we call this a "trajectory". 
 
 ```{r}
-mktrj(pc.xray, file = "results.pdb")
+#mktrj(pc.xray, file = "results.pdb")
 ```
 
 
