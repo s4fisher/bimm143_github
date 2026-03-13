@@ -15,7 +15,7 @@ Class 08 [Cancer Mini-Project](Class08/Class08.md)
 
 Class 09 [Candy Mini-Project](Class09/Class09.md)
 
-Class 10 [Structural Bioinformatics](Class10/Class.10.Bimm143/Class.10.pdf)
+Class 10 [Structural Bioinformatics](Class.10/Class.10.Bimm143/Class.10.pdf)
 
 Class 11 [Structural Bioinformatics pt2](Class11/Class11.md)
 
