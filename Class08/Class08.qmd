@@ -1,0 +1,286 @@
+---
+title: "Class08"
+author: "Samuel Fisher (A18131929)"
+format: pdf
+---
+
+# Save your input data file into your Project directory
+
+fna.data <- "WisconsinCancer.csv"
+
+# Complete the following code to input the data and store as wisc.df
+
+wisc.df <- ___(fna.data, row.names=1)
+
+## Exploratory Data Analysis
+First we load the Wisconsin cancer dataset and prepare it for analysis.
+
+```{r}
+fna.data <- "WisconsinCancer.csv"
+wisc.df <- read.csv(fna.data, row.names=1)
+head(wisc.df, 4)
+```
+
+We remove the diagnosis column so unsupervised methods do not use the known labels.
+```{r}
+wisc.data <- wisc.df[, -1]
+```
+
+## Diagnosis Vector
+We save the diagnosis column as a factor for later comparison and plotting.
+```{r}
+diagnosis <- as.factor(wisc.df$diagnosis)
+```
+
+## Q1 - Number of observations
+We check how many observations (rows) are in the dataset.
+```{r}
+nrow(wisc.data)
+```
+
+There are 569 observations in the dataset 
+
+## Q2 - Number of malignant samples
+We want to count how many samples are labeled malignant in the diagnosis vector.
+
+```{r}
+table(diagnosis)
+```
+
+212 observations are malignant
+
+## Q3 - Number of _mean features
+We want to count how many variable names end with _mean.
+
+```{r}
+length(grep("_mean$", colnames(wisc.data)))
+```
+
+10 variables names end with _mean
+
+## Principal Component Analysis
+# Check column means and standard deviations
+```{r}
+colMeans(wisc.data)
+apply(wisc.data, 2, sd)
+```
+
+The variables have very different standard deviations, so scaling is required before performing PCA.
+
+
+## PCA Model
+# Perform PCA on wisc.data by completing the following code
+```{r}
+wisc.pr <- prcomp(wisc.data, scale = TRUE)
+```
+
+We want to look over the PCA summary to see how much variance of each principal component
+```{r}
+summary(wisc.pr)
+```
+
+## Q4 - Variance found by PC1
+Proportion of Variance — PC1 = 0.4427, therefore PC1 captures 44.27% of the total variance.
+
+## Q5 - PCs needed for 70% variance
+PC1 = 0.4427
+PC2 = 0.6324
+PC3 = 0.72636  ← first value greater than or equal to 0.70
+
+Three principal components are needed to explain at least 70% of the variance.
+
+## Q6 - PCs needed for 90% variance
+PC6 = 0.88759
+PC7 = 0.91010  ← first value greater than or equal to 0.90
+Seven principal components are needed to explain at least 90% of the variance.
+
+## Interpreting PCA Results
+We want to create a PCA biplot to visualize both sample scores and feature loadings.
+
+```{r}
+biplot(wisc.pr)
+```
+
+## Q7 - Biplot Interpretation
+The biplot is incredibly difficult to interpret because it is chaotic and with many things overlapping. The row labels are all over the figure, making patterns and group separation hard to see and understand.
+
+## PC1 vs PC2 Plot
+
+ Scatter plot observations by components 1 and 2
+```{r}
+library(ggplot2)
+ggplot(wisc.pr$x) +
+  aes(PC1, PC2, col = diagnosis) +
+  geom_point()
+```
+
+## Q8 - Compare plots of PC1 vs PC2 to plot of PC1 vs PC3
+
+```{r}
+ggplot(wisc.pr$x) +
+  aes(PC1, PC3, col = diagnosis) +
+  geom_point()
+```
+# PC1 vs PC3 Plot
+The PC1 vs PC2 plot has a clearer separation between M and B samples than the PC1 vs PC3 plot. This shows that PC2 captures more class-separating structure than PC3. PC1 seems to drive most of the separation overall, while later components add less discriminatory power.
+
+
+## Variance Explained
+
+# Calculate variance of each component
+```{r}
+pr.var <- wisc.pr$sdev^2
+head(pr.var)
+```
+
+```{r}
+pve <- pr.var / sum(pr.var)
+plot(c(1,pve), xlab = "Principal Component",
+ylab = "Proportion of Variance Explained",
+ylim = c(0, 1), type = "o")
+```
+
+# Alternative scree plot of the same data, note data driven y-axis
+```{r}
+barplot(pve, ylab = "Percent of Variance Explained",
+names.arg=paste0("PC",1:length(pve)), las=2, axes = FALSE)
+axis(2, at=pve, labels=round(pve,2)*100 )
+```
+
+## Q9 — Plot Interpretation
+```{r}
+wisc.pr$rotation["concave.points_mean", 1]
+sort(wisc.pr$rotation[,1], decreasing=TRUE)[1:5]
+sort(abs(wisc.pr$rotation[,1]), decreasing=TRUE)[1:5]
+```
+The loading value for concave.points_mean in PC1 is 0.2608538. There are no features with a larger absolute loading than this one. It is the largest contributor to PC1 (with concavity_mean and concave.points_worst being slightly smaller but similar).
+
+## Hierarchical Clustering
+
+```{r}
+data.scaled <- scale(wisc.data)
+data.dist <- dist(data.scaled)
+```
+
+Perform hierarchical clustering using complete linkage and plot
+
+```{r}
+wisc.hclust <- hclust(data.dist, method = "complete")
+plot(wisc.hclust)
+```
+
+## Q10
+```{r}
+plot(wisc.hclust)
+abline(h = 15, col="red", lty=2)
+```
+The height at which the clustering model has 4 clusters is approximately 15. 
+
+
+```{r}
+wisc.clusters <- cutree(wisc.hclust, k = 4)
+```
+
+```{r}
+table(wisc.clusters, diagnosis)
+```
+
+## Q12
+Ward.D2 gives the best results because it creates the cleanest and most balanced cluster separation while minimizing cluster variance within, which fits this dataset well.
+
+
+## Clustering on PCA Results
+
+We will do the hierarchical clustering again but using average linkage to compare results.
+```{r}
+wisc.hclust.avg <- hclust(data.dist, method = "average")
+plot(wisc.hclust.avg)
+```
+
+```{r}
+wisc.clusters.avg <- cutree(wisc.hclust.avg, k = 2)
+table(wisc.clusters.avg, diagnosis)
+```
+
+## Average Linkage Cluster Comparison
+Using average linkage makes a similar result to complete linkage. The clusters still don't align perfectly with diagnosis labels. This shows that hierarchical clustering w/o labels doesn't perfectly separate B and M samples.
+
+## Clustering on PCA Scores
+
+# Hierarchical clustering on PCA scores (first 7 PCs)
+```{r}
+pc.dist <- dist(wisc.pr$x[,1:7])
+wisc.pr.hclust <- hclust(dist(wisc.pr$x[,1:7]), method = "ward.D2")
+plot(wisc.pr.hclust)
+
+```
+
+```{r}
+grps <- cutree(wisc.pr.hclust, k=2)
+table(grps)
+```
+
+```{r}
+table(grps, diagnosis)
+```
+```{r}
+ggplot(wisc.pr$x) +
+aes(PC1, PC2) +
+geom_point(col=grps)
+```
+
+## Use the distance along the first 7 PCs for clustering i.e. wisc.pr$x[, 1:7]
+```{r}
+wisc.pr.hclust <- hclust(dist(wisc.pr$x[,1:7]), method="ward.D2")
+```
+
+```{r}
+wisc.pr.hclust.clusters <- cutree(wisc.pr.hclust, k=2)
+```
+
+## Q13
+
+# Compare to actual diagnoses
+```{r}
+table(wisc.pr.hclust.clusters, diagnosis)
+```
+It separates pretty well, with 52 total misclassified. 28 Benign mixed into the mostly malignant cluster plus 24 malignant mixed into the mostly-benign cluster.
+
+## Q14
+```{r}
+table(wisc.clusters, diagnosis)
+```
+Clustering on the PCA transformed data separates the diagnoses better than clustering on the original features. The PCA based model generates two better clusters that have less mixed benign/malignant cases. The original data clustering spreads samples across more mixed clusters.
+
+
+### Prediction
+```{r}
+#url <- "new_samples.csv"
+url <- "https://tinyurl.com/new-samples-CSV"
+new <- read.csv(url)
+npc <- predict(wisc.pr, newdata=new)
+npc
+```
+
+```{r}
+plot(wisc.pr$x[,1:2], col=grps)
+points(npc[,1], npc[,2], col="blue", pch=16, cex=3)
+text(npc[,1], npc[,2], c(1,2), col="white")
+```
+
+## Q16
+Patient 1 should be prioritized for a follow up because it falls within the malignant like cluster.Patient 2 groups with the benign like cluster.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
